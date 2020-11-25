@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <meta charset="UTF-8" />
+  <meta name="description" content="RCE Playground" />
+  <title>Playground</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css" />
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .h100 {
+      height: 100%;
+    }
+    #playground {
+      overflow: hidden;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+</head>
+
+<body>
+  <article id="app" class="markdown-body h100">
+    <div class="d-flex flex-row flex-justify-around h100">
+      <div class="col-5 float-left p-6 h100">
+        <div class="form-group d-flex flex-row flex-justify-between">
+          <select class="form-select" v-model="language"
+            v-on:change="changeLanguage">
+            {% raw %}
+            <option v-for="option in languageOptions" v-bind:value="option">{{ option }}</option>
+            {% endraw %}
+          </select>
+          <button type="submit" class="btn btn-md btn-primary" v-on:click="run">Run</button>
+        </div>
+
+        <!-- TODO: set this automatically -->
+        <div id="playground" style="height: 90%"></div>
+      </div>
+      <div class="col-5 float-left m-6" id="output">
+        {% raw %}
+        <h1>Results</h1>
+        <h2>exit code</h2>
+        <pre>{{ exitCode }}</pre>
+        <h2>stdout</h2>
+        <pre>{{ stdout }}</pre>
+        <h2>stderr</h2>
+        <pre>{{ stderr }}</pre>
+        {% endraw %}
+      </div>
+    </div>
+  </article>
+</body>
+
+<script>
+  // TODO: make this an injected variable
+  const RCE_ADDR = "http://127.0.0.1:8080";
+  const LANGUAGE_TEMPLATES = {
+    "python": `print("Hello, world!")`,
+    "javascript": `console.error("Hello, world!");`,
+    "cpp": `
+#include <iostream>
+
+int main() {
+  std::cout << "Hello, world!\\n";
+}`,
+  };
+  const DEFAULT_LANGUAGE = "python";
+
+  require.config({ paths: { vs: "https://unpkg.com/monaco-editor@0.8.3/min/vs" } });
+  window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+  const proxy = URL.createObjectURL(
+    new Blob(
+      [
+        `
+	self.MonacoEnvironment = { baseUrl: 'https://unpkg.com/monaco-editor@0.8.3/min/' };
+	importScripts('https://unpkg.com/monaco-editor@0.8.3/min/vs/base/worker/workerMain.js');`,
+      ],
+      { type: "text/javascript" }
+    )
+  );
+
+  const $ = document.querySelector.bind(document);
+  let editor;
+
+  require(["vs/editor/editor.main"], function () {
+    editor = monaco.editor.create($("#playground"), {
+      value: LANGUAGE_TEMPLATES[DEFAULT_LANGUAGE],
+      language: DEFAULT_LANGUAGE,
+      theme: "vs-dark",
+      fontSize: "15px",
+      roundedSelection: false,
+      paddingTop: "20px",
+      padding: { top: "20px" },
+    });
+
+    editor.addListener("didType", () => {});
+  });
+
+  new Vue({
+    el: "#app",
+    data: {
+      language: "python",
+      languageOptions: Object.keys(LANGUAGE_TEMPLATES),
+      exitCode: "",
+      stdout: "",
+      stderr: "",
+    },
+    methods: {
+      async run() {
+        const {data: {exitcode, stdout, stderr}} = await axios.post('/api/rce', {
+          lang: this.language,
+          code: editor.getValue(),
+        }).catch(console.error);
+
+        this.exitCode = exitcode;
+        this.stdout = stdout;
+        this.stderr = stderr;
+      },
+
+      changeLanguage() {
+        editor.setValue(LANGUAGE_TEMPLATES[this.language].trim());
+        monaco.editor.setModelLanguage(editor.getModel(), this.language);
+      }
+    },
+  });
+</script>
