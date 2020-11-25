@@ -1,0 +1,16 @@
+description: "rust nightly 2020-11-15"
+ecosystem_pkg:
+  - regex@1.4.2
+  - serde@1.0.117 --features derive
+  - rand@0.7.3
+
+pre_install_pkg: |
+  curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2020-11-15 --profile minimal
+  source $HOME/.cargo/env && USER=playground cargo init --bin $HOME/playground
+  sudo apt-get install libssl-dev pkg-config
+  source $HOME/.cargo/env && cargo install cargo-edit
+  mkdir $HOME/playground/src/bin
+  sudo apt-get install -y git
+install_pkg_command: cd $HOME/playground && source $HOME/.cargo/env && cargo add
+post_install_pkg: |
+  cd $HOME/playground && source $HOME/.cargo/env && cargo build

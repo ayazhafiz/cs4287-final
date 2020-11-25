@@ -1,4 +1,3 @@
 #!/bin/bash
-# For "watch" mode, call with FLASK_ENV=development as well.
 
-FLASK_APP=run-lang flask run --port 9000
+waitress-serve --port=9000 --call 'run_lang:create_app'

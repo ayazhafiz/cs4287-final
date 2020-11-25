@@ -1,6 +1,10 @@
 import subprocess as sp
 import tempfile
 import os
+from pathlib import Path
+
+
+HOME = os.environ["HOME"]
 
 
 def response(code, stdout, stderr):
@@ -63,26 +67,22 @@ def execute_cpp(code):
 
 
 def execute_rust(code):
-    with tempfile.TemporaryDirectory() as tmp:
-        out = os.path.join(tmp, 'out')
-        compilation = sp.Popen(
-            ['rustc', '-o', out, '-'],
+    orig = os.getcwd()
+    os.chdir(f"{HOME}/playground")
+    with tempfile.NamedTemporaryFile('w', dir="src/bin",
+                                     suffix=".rs") as tmp:
+        tmp.write(code)
+        tmp.flush()
+        bin_name = Path(tmp.name).stem
+        cmd = sp.Popen(
+            [f"{HOME}/.cargo/bin/cargo", 'run', '--bin', bin_name],
             stdin=sp.PIPE,
             stdout=sp.PIPE,
             stderr=sp.PIPE,
         )
-        compilation.stdin.write(code.encode('utf-8'))
-        compilation.stdin.close()
-        compilation.wait()
-        if compilation.returncode != 0:
-            return response(compilation.returncode,
-                            compilation.stdout.read(),
-                            compilation.stderr.read())
-        evaluation = sp.Popen([out],
-                              stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
-        evaluation.wait()
-        return response(evaluation.returncode,
-                        evaluation.stdout.read(), evaluation.stderr.read())
+        cmd.wait()
+    os.chdir(orig)
+    return response(cmd.returncode, cmd.stdout.read(), cmd.stderr.read())
 
 
 EXECUTE_LANG_TABLE = {
@@ -93,12 +93,5 @@ EXECUTE_LANG_TABLE = {
 }
 
 
-class LanguageNotFound(BaseException):
-    pass
-
-
 def execute(lang, code):
-    try:
-        return EXECUTE_LANG_TABLE[lang](code)
-    except KeyError:
-        raise LanguageNotFound()
+    return EXECUTE_LANG_TABLE[lang](code)
