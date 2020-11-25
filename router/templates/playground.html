@@ -45,15 +45,18 @@
         <div id="playground" style="height: 90%"></div>
       </div>
       <div class="col-5 float-left m-6" id="output">
-        {% raw %}
         <h1>Results</h1>
-        <h2>exit code</h2>
-        <pre>{{ exitCode }}</pre>
-        <h2>stdout</h2>
-        <pre>{{ stdout }}</pre>
-        <h2>stderr</h2>
-        <pre>{{ stderr }}</pre>
-        {% endraw %}
+        <div v-show="loading">Working...</div>
+        <div v-show="!loading">
+          {% raw %}
+          <h2>exit code</h2>
+          <pre>{{ exitCode }}</pre>
+          <h2>stdout</h2>
+          <pre>{{ stdout }}</pre>
+          <h2>stderr</h2>
+          <pre>{{ stderr }}</pre>
+          {% endraw %}
+        </div>
       </div>
     </div>
   </article>
@@ -64,32 +67,35 @@
   const RCE_ADDR = "http://127.0.0.1:8080";
   const LANGUAGE_TEMPLATES = {
     "python": `print("Hello, world!")`,
-    "javascript": `console.error("Hello, world!");`,
+    "javascript": `console.log("Hello, world!");`,
     "cpp": `
 #include <iostream>
 
 int main() {
   std::cout << "Hello, world!\\n";
 }`,
+    "rust": `
+fn main() {
+  println!("Hello, world!");
+}`,
   };
   const DEFAULT_LANGUAGE = "python";
 
-  require.config({ paths: { vs: "https://unpkg.com/monaco-editor@0.8.3/min/vs" } });
+  require.config({ paths: { vs: "https://unpkg.com/monaco-editor@0.21.2/min/vs" } });
   window.MonacoEnvironment = { getWorkerUrl: () => proxy };
 
   const proxy = URL.createObjectURL(
     new Blob(
       [
         `
-	self.MonacoEnvironment = { baseUrl: 'https://unpkg.com/monaco-editor@0.8.3/min/' };
-	importScripts('https://unpkg.com/monaco-editor@0.8.3/min/vs/base/worker/workerMain.js');`,
+	self.MonacoEnvironment = { baseUrl: 'https://unpkg.com/monaco-editor@0.21.2/min/' };
+	importScripts('https://unpkg.com/monaco-editor@0.21.2/min/vs/base/worker/workerMain.js');`,
       ],
       { type: "text/javascript" }
     )
   );
 
   const $ = document.querySelector.bind(document);
-  let editor;
 
   require(["vs/editor/editor.main"], function () {
     editor = monaco.editor.create($("#playground"), {
@@ -97,12 +103,8 @@ int main() {
       language: DEFAULT_LANGUAGE,
       theme: "vs-dark",
       fontSize: "15px",
-      roundedSelection: false,
-      paddingTop: "20px",
       padding: { top: "20px" },
     });
-
-    editor.addListener("didType", () => {});
   });
 
   new Vue({
@@ -113,13 +115,16 @@ int main() {
       exitCode: "",
       stdout: "",
       stderr: "",
+      loading: false,
     },
     methods: {
       async run() {
+        this.loading = true;
         const {data: {exitcode, stdout, stderr}} = await axios.post('/api/rce', {
           lang: this.language,
           code: editor.getValue(),
         }).catch(console.error);
+        this.loading = false;
 
         this.exitCode = exitcode;
         this.stdout = stdout;

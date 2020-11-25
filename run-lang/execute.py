@@ -1,4 +1,6 @@
 import subprocess as sp
+import tempfile
+import os
 
 
 def response(code, stdout, stderr):
@@ -38,23 +40,56 @@ def execute_javascript(code):
 
 
 def execute_cpp(code):
-    # TODO
-    cmd = sp.Popen(
-        ['node'],
-        stdin=sp.PIPE,
-        stdout=sp.PIPE,
-        stderr=sp.PIPE,
-    )
-    cmd.stdin.write(code.encode('utf-8'))
-    cmd.stdin.close()
-    cmd.wait()
-    return response(cmd.returncode, cmd.stdout.read(), cmd.stderr.read())
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, 'out')
+        compilation = sp.Popen(
+            ['g++', '-x', 'c++', '-o', out, '-'],
+            stdin=sp.PIPE,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+        )
+        compilation.stdin.write(code.encode('utf-8'))
+        compilation.stdin.close()
+        compilation.wait()
+        if compilation.returncode != 0:
+            return response(compilation.returncode,
+                            compilation.stdout.read(),
+                            compilation.stderr.read())
+        evaluation = sp.Popen([out],
+                              stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+        evaluation.wait()
+        return response(evaluation.returncode,
+                        evaluation.stdout.read(), evaluation.stderr.read())
+
+
+def execute_rust(code):
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, 'out')
+        compilation = sp.Popen(
+            ['rustc', '-o', out, '-'],
+            stdin=sp.PIPE,
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+        )
+        compilation.stdin.write(code.encode('utf-8'))
+        compilation.stdin.close()
+        compilation.wait()
+        if compilation.returncode != 0:
+            return response(compilation.returncode,
+                            compilation.stdout.read(),
+                            compilation.stderr.read())
+        evaluation = sp.Popen([out],
+                              stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+        evaluation.wait()
+        return response(evaluation.returncode,
+                        evaluation.stdout.read(), evaluation.stderr.read())
 
 
 EXECUTE_LANG_TABLE = {
     "python": execute_python,
     "javascript": execute_javascript,
     "cpp": execute_cpp,
+    "rust": execute_rust,
 }
 
 
