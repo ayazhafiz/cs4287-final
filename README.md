@@ -2,9 +2,13 @@
 
 ## [router](./router)
 
-Package `router` provides a web server that routes requests to `run-lang`
+Package `router` provides a web server that routes requests to `run_lang`
 servers.
 
-## [run-lang](./run-lang)
+## [run_lang](./run_lang)
 
-Package `run-lang` provides an API server answering code execution queries.
+Package `run_lang` provides an API server answering code execution queries.
+
+## [images](./images)
+
+Package `images` provides `run_lang` images for different ecosystems.

@@ -4,7 +4,8 @@ ecosystem_pkg:
   - pendulum==2.1.2
   - requests==2.25.0
 
-pre_install_pkg: |
-  apt-get install -y python3.7 python3-pip
+pre_install_pkg:
+  - RUN apt-get install -y python3.7 python3-pip
 install_pkg_command: pip3 install
-post_install_pkg: echo 0
+post_install_pkg:
+  - RUN echo 0

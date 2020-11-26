@@ -1,3 +1,3 @@
-# run-lang
+# run_lang
 
-Package `run-lang` executes code in a language.
+Package `run_lang` executes code in a language.

@@ -4,13 +4,18 @@ ecosystem_pkg:
   - serde@1.0.117 --features derive
   - rand@0.7.3
 
-pre_install_pkg: |
-  sudo apt-get install -y git libssl-dev pkg-config
-  curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2020-11-15 --profile minimal
-  source $HOME/.cargo/env && USER=playground cargo init --bin $HOME/playground
-  source $HOME/.cargo/env && cargo install cargo-edit
-  mkdir $HOME/playground/src/bin
-install_pkg_command: cd $HOME/playground && source $HOME/.cargo/env && cargo add
-post_install_pkg: |
-  cd $HOME/playground && cat Cargo.toml
-  cd $HOME/playground && source $HOME/.cargo/env && cargo build
+pre_install_pkg:
+  - ENV HOME /root
+  - RUN sudo apt-get install -y git libssl-dev pkg-config
+  - RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2020-11-15 --profile minimal
+  - ENV PATH="$HOME/.cargo/bin:${PATH}"
+  - RUN cargo install cargo-edit
+  - RUN USER=playground cargo init --bin $HOME/playground
+  - RUN ls $HOME/playground
+  - WORKDIR $HOME/playground
+  - RUN mkdir src/bin
+install_pkg_command: cargo add
+post_install_pkg:
+  - RUN cat Cargo.toml
+  - RUN cargo build
+  - WORKDIR /
