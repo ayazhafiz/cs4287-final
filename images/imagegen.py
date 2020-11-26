@@ -6,7 +6,6 @@ import sys
 
 def gen_env(language, description):
     return f"""
-ENV RUN_LANG_UBUNTU="18.04"
 ENV RUN_LANG_WHICH="{language}"
 ENV RUN_LANG_WHICH_DESCRIPTION="{description}"
 """.strip()
@@ -22,18 +21,9 @@ def gen_dockerfile(language, description, cmd_pre_install_packages,
 # Generated Dockerfile, do not modify directly!
 # Modify `dockergen.yaml` and run
 #   `python images/dockergen.py` in the root directory.
-FROM ubuntu:18.04
+FROM ayazhafiz/runlang_base:latest
 SHELL ["/bin/bash", "-c"]
 
-{gen_env(language, description)}
-
-# Service setup
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get update && apt-get -y install sudo
-RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
-
-RUN apt-get install -y python3.7 python3-pip
 COPY run_lang/requirements.txt /tmp/requirements.txt
 RUN pip3 install --requirement /tmp/requirements.txt
 
@@ -50,6 +40,8 @@ RUN pip3 install --requirement /tmp/requirements.txt
 COPY run_lang /run_lang
 COPY start_run_lang.sh /start_run_lang.sh
 COPY images/{language}/packages /packages
+
+{gen_env(language, description)}
 
 WORKDIR /
 
@@ -86,6 +78,8 @@ if not os.path.exists('images/'):
     sys.exit(1)
 
 for path in glob.glob('images/*/'):
+    if 'runlang_base' in path:
+        continue
     language = os.path.relpath(path, 'images/')
     print(f"Generating \"{language}\"...")
     gen_image(path, language)
