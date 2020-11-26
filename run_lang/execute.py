@@ -75,7 +75,9 @@ def execute_rust(code):
         tmp.flush()
         bin_name = Path(tmp.name).stem
         cmd = sp.Popen(
-            [f"{HOME}/.cargo/bin/cargo", 'run', '--bin', bin_name],
+            [f"{HOME}/.cargo/bin/cargo", 'run',
+             "--color", "always",
+             '--bin', bin_name],
             stdin=sp.PIPE,
             stdout=sp.PIPE,
             stderr=sp.PIPE,

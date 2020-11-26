@@ -12,4 +12,5 @@ pre_install_pkg: |
   mkdir $HOME/playground/src/bin
 install_pkg_command: cd $HOME/playground && source $HOME/.cargo/env && cargo add
 post_install_pkg: |
+  cd $HOME/playground && cat Cargo.toml
   cd $HOME/playground && source $HOME/.cargo/env && cargo build

@@ -20,10 +20,60 @@
     #playground {
       overflow: hidden;
     }
+    /* Ansi -> HTML styles for use in coloring error messages. */
+    .ansi-black-fg {
+      color: #282c34;
+    }
+    .ansi-red-fg {
+      color: #e06c75;
+    }
+    .ansi-green-fg {
+      color: #73cc32;
+    }
+    .ansi-yellow-fg {
+      color: #d19a66;
+    }
+    .ansi-blue-fg {
+      color: #61afef;
+    }
+    .ansi-magenta-fg {
+      color: #c678dd;
+    }
+    .ansi-cyan-fg {
+      color: #56b6c2;
+    }
+    .ansi-white-fg {
+      color: #abb2bf;
+    }
+    .ansi-bright-black-fg {
+      color: #5c6370;
+    }
+    .ansi-bright-red-fg {
+      color: #e06c75;
+    }
+    .ansi-bright-green-fg {
+      color: #73cc32;
+    }
+    .ansi-bright-yellow-fg {
+      color: #d19a66;
+    }
+    .ansi-bright-blue-fg {
+      color: #61afef;
+    }
+    .ansi-bright-magenta-fg {
+      color: #c678dd;
+    }
+    .ansi-bright-cyan-fg {
+      color: #56b6c2;
+    }
+    .ansi-bright-white-fg {
+      color: #ffffff;
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ansi_up@4.0.4/ansi_up.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
 </head>
 
@@ -33,27 +83,30 @@
       <div class="col-5 float-left p-6 h100">
         <div class="form-group d-flex flex-row flex-justify-between">
           <div class="d-flex flex-row">
-          <select class="form-select" v-model="language"
-            v-on:change="changeLanguage">
-            {% raw %}
-            <option v-for="option in languageOptions" v-bind:value="option">{{ option }}</option>
-            {% endraw %}
-          </select>
+            <select class="form-select" v-model="language" v-on:change="changeLanguage">
+              {% raw %}
+              <option v-for="option in languageOptions" v-bind:value="option">{{ option }}</option>
+              {% endraw %}
+            </select>
 
-          <details class="details-reset position-relative ml-2 mb-0">
-            <summary class="btn btn-outline" v-on:click="getDescription">info</summary>
-            <div class="Popover right-0 left-0">
-              <div class="Popover-message Popover-message--large Popover-message--top-left p-4 mt-2 Box box-shadow-large">
-                <div v-show="descriptionLoading"><span>Loading</span><span class="AnimatedEllipsis"></span></div>
-                <div v-show="!descriptionLoading">
-                  {% raw %}
-                  <b>{{ languageDescription }} - {{ osVersion }}</b>
-                  <pre class="mb-0">{{ packages.join('\n') }}</pre>
-                  {% endraw %}
+            <details class="details-reset position-relative ml-2 mb-0">
+              <summary class="btn btn-outline" v-on:click="getDescription">info</summary>
+              <div class="Popover right-0 left-0">
+                <div
+                  class="Popover-message Popover-message--large Popover-message--top-left p-4 mt-2 Box box-shadow-large"
+                >
+                  <div v-show="descriptionLoading">
+                    <span>Loading</span><span class="AnimatedEllipsis"></span>
+                  </div>
+                  <div v-show="!descriptionLoading">
+                    {% raw %}
+                    <b>{{ languageDescription }} - {{ osVersion }}</b>
+                    <pre class="mb-0">{{ packages.join('\n') }}</pre>
+                    {% endraw %}
+                  </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
           </div>
 
           <button type="submit" class="btn btn-md btn-primary" v-on:click="run">Run</button>
@@ -64,15 +117,17 @@
       </div>
       <div class="col-5 float-left m-6" id="output">
         <h1>Results</h1>
-        <div v-show="resultLoading"><h2><span>Loading</span><span class="AnimatedEllipsis"></span></h2></div>
+        <div v-show="resultLoading">
+          <h2><span>Loading</span><span class="AnimatedEllipsis"></span></h2>
+        </div>
         <div v-show="!resultLoading">
           {% raw %}
           <h2>exit code</h2>
           <pre>{{ exitCode }}</pre>
           <h2>stdout</h2>
-          <pre>{{ stdout }}</pre>
+          <component :is="stdoutHtml"></component>
           <h2>stderr</h2>
-          <pre>{{ stderr }}</pre>
+          <component :is="stderrHtml"></component>
           {% endraw %}
         </div>
       </div>
@@ -84,15 +139,15 @@
   // TODO: make this an injected variable
   const RCE_ADDR = "http://127.0.0.1:8080";
   const LANGUAGE_TEMPLATES = {
-    "python": `print("Hello, world!")`,
-    "javascript": `console.log("Hello, world!");`,
-    "cpp": `
+    python: `print("Hello, world!")`,
+    javascript: `console.log("Hello, world!");`,
+    cpp: `
 #include <iostream>
 
 int main() {
   std::cout << "Hello, world!\\n";
 }`,
-    "rust": `
+    rust: `
 fn main() {
   println!("Hello, world!");
 }`,
@@ -125,6 +180,9 @@ fn main() {
     });
   });
 
+  const ansi = new AnsiUp();
+  ansi.use_classes = true;
+
   new Vue({
     el: "#app",
     data: {
@@ -139,24 +197,44 @@ fn main() {
       resultLoading: false,
       descriptionLoading: false,
     },
+    computed: {
+      stdoutHtml() {
+        return {
+          template: `<pre class="inner">${this.stdout}</pre>`,
+        };
+      },
+      stderrHtml() {
+        return {
+          template: `<pre class="inner">${this.stderr}</pre>`,
+        };
+      },
+    },
     methods: {
       async run() {
         this.resultLoading = true;
-        const {data: {exitcode, stdout, stderr}} = await axios.post('/api/rce', {
-          lang: this.language,
-          code: editor.getValue(),
-          }).catch(console.error).finally(() => this.resultLoading = false);
+        const {
+          data: { exitcode, stdout, stderr },
+        } = await axios
+          .post("/api/rce", {
+            lang: this.language,
+            code: editor.getValue(),
+          })
+          .catch(console.error)
+          .finally(() => (this.resultLoading = false));
 
         this.exitCode = exitcode;
-        this.stdout = stdout;
-        this.stderr = stderr;
+        this.stdout = ansi.ansi_to_html(stdout);
+        this.stderr = ansi.ansi_to_html(stderr);
       },
 
       async getDescription() {
         this.descriptionLoading = true;
-        const {data: {description, packages, ubuntu}} = await axios.get(
-          `/api/describe/${this.language}`
-        ).catch(console.error).finally(() => this.descriptionLoading = false);
+        const {
+          data: { description, packages, ubuntu },
+        } = await axios
+          .get(`/api/describe/${this.language}`)
+          .catch(console.error)
+          .finally(() => (this.descriptionLoading = false));
 
         this.languageDescription = description;
         this.osVersion = `Ubuntu ${ubuntu}`;
@@ -166,7 +244,7 @@ fn main() {
       changeLanguage() {
         editor.setValue(LANGUAGE_TEMPLATES[this.language].trim());
         monaco.editor.setModelLanguage(editor.getModel(), this.language);
-      }
+      },
     },
   });
 </script>

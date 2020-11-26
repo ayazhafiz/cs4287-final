@@ -20,6 +20,7 @@ RUN cd $HOME/playground && source $HOME/.cargo/env && cargo add serde@1.0.117 --
 RUN cd $HOME/playground && source $HOME/.cargo/env && cargo add rand@0.7.3
 
 # Post-install
+RUN cd $HOME/playground && cat Cargo.toml
 RUN cd $HOME/playground && source $HOME/.cargo/env && cargo build
 
 # Service setup
