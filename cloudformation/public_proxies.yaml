@@ -16,3 +16,6 @@ Resources:
       SubnetId: !ImportValue PublicSubnetAID
       SecurityGroupIds:
         - !ImportValue BastionHostSecurityGroupID
+      Tags:
+        - Key: Name
+          Value: bastion-host
