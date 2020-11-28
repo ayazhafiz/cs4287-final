@@ -1,0 +1,118 @@
+Resources:
+  # --------------------------- VPCs ---------------------------
+  ProdVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      # 10.0.0.0 - 10.0.63.255
+      CidrBlock: 10.0.0.0/18
+
+  # --------------------------- Subnets ---------------------------
+  # We need at least 2 public subnets because load balancer (ALB) nodes
+  # must be spread out among at least 2.
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: us-east-2a
+      # 10.0.0.0 - 10.0.0.255
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref ProdVPC
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: us-east-2b
+      # 10.0.1.0 - 10.0.1.255
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref ProdVPC
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-2a
+      # 10.0.1.0 - 10.0.1.255
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref ProdVPC
+
+  # --------------------------- Route Tables ---------------------------
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ProdVPC
+  PublicSubnetInternetGatewayRoute:
+    Type: AWS::EC2::Route
+    DependsOn: ProdVPCInternetGatewayAssociation
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicSubnetRouteTable
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetA
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetB
+
+  PrivateSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ProdVPC
+  PrivateSubnetNatGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+      RouteTableId: !Ref PrivateSubnetRouteTable
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnet
+
+  # --------------------------- Gateways ---------------------------
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  ProdVPCInternetGatewayAssociation:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref ProdVPC
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayElasticIp.AllocationId
+      SubnetId: !Ref PublicSubnetA
+  NatGatewayElasticIp:
+    Type: AWS::EC2::EIP
+    DependsOn: ProdVPCInternetGatewayAssociation
+    Properties:
+      Domain: vpc
+
+Outputs:
+  ProdVPC:
+    Description: Prod VPC ID
+    Value: !Ref ProdVPC
+    Export:
+      Name: ProdVPCID
+  PublicSubnetA:
+    Description: Public Subnet A ID
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: PublicSubnetAID
+  PublicSubnetB:
+    Description: Public Subnet B ID
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: PublicSubnetBID
+  PrivateSubnet:
+    Description: Private Subnet ID
+    Value: !Ref PrivateSubnet
+    Export:
+      Name: PrivateSubnetID
+

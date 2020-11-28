@@ -1,0 +1,9 @@
+Resources:
+  # TODO
+  ElastiCacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      AutoMinorVersionUpgrade: Boolean
+      AZMode: String
+      CacheNodeType: String
+  # TODO

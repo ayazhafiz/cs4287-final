@@ -1,0 +1,24 @@
+Resources:
+  BastionHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Safe security group to be used for the bastion host
+      VpcId: !ImportValue ProdVPCID
+      SecurityGroupIngress:
+      - Description: SSH
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        # Don't give the bastion host direct egress access to the Internet.
+        # Private Subnet CIDR
+        CidrIp: 10.0.2.0/24
+
+Outputs:
+  BastionHostSecurityGroup:
+    Description: Bastion host security group ID
+    Value: !Ref BastionHostSecurityGroup
+    Export:
+      Name: BastionHostSecurityGroupID
