@@ -6,7 +6,7 @@
   <title>Playground</title>
 
   <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css" />
-  <link rel="stylesheet" type= "text/css" href="{{ url_for('static',filename='styles/main.css') }}">
+  <link rel="stylesheet" type= "text/css" href="{{ url_for('static',filename='main.css') }}">
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
@@ -38,7 +38,10 @@
             </details>
           </div>
 
-          <button type="submit" class="btn btn-md btn-primary" v-on:click="run">Run</button>
+          <div class="d-flex flex-row">
+            <copypg :status="copyStatus" :on-click="copyPlayground"></copypg>
+            <button type="submit" class="btn btn-md btn-primary ml-2" v-on:click="run">Run</button>
+          </div>
         </div>
 
         <!-- TODO: set this automatically -->
@@ -50,6 +53,11 @@
       </div>
     </div>
   </article>
-  <script src="{{ url_for('static',filename='styles/main.js') }}"></script>
+  <script>
+    const DEFAULT_LANGUAGE = "{{ active_lang | safe }}";
+    const LANGUAGE_BUFFERS = {{ lang_buffers | safe }};
+    const DEFAULT_EXECUTION_RESULT = {{ execution_result | safe }};
+  </script>
+  <script src="{{ url_for('static',filename='main.js') }}"></script>
 </body>
 </html>
