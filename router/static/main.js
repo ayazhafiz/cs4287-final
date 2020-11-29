@@ -212,7 +212,7 @@ new Vue({
 
     async copyPlayground() {
       this.copyStatus = CopyStatus.loading();
-      editor.setValue(LANGUAGE_BUFFERS[this.language]);
+      LANGUAGE_BUFFERS[this.lastLanguage] = editor.getValue();
       await axios
           .post(`api/save_playground`, {
             active_lang: this.language,

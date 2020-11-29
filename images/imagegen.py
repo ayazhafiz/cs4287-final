@@ -59,7 +59,8 @@ def gen_image(path, language):
     install_package_cmd = data["install_pkg_command"].strip()
     packages = data["ecosystem_pkg"]
     cmds_install_packages = list(
-        map(lambda pkg: f"RUN {install_package_cmd} {pkg}", packages))
+        map(lambda pkg: f"RUN {install_package_cmd.replace('{}', pkg)}",
+            packages))
 
     dockerfile = gen_dockerfile(
         language=language,

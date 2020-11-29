@@ -139,11 +139,44 @@ fn main() {
 }
 """.strip(),
 
-  "cpp": """
-#include <iostream>
+  "cpp": r"""
+// Derived from the POCO introduction
+// https://pocoproject.org/docs/00100-GuidedTour.html
+#include "Poco/BasicEvent.h"
+#include "Poco/Delegate.h"
+#include <fmt/core.h>
+#include <nlohmann/json.hpp>
 
-int main() {
-  std::cout << "Hello, world!\\n";
+using Poco::BasicEvent;
+using Poco::delegate;
+using nlohmann::json;
+
+struct Source {
+    BasicEvent<int> theEvent;
+    void fireEvent(int n) {
+        theEvent(this, n);
+    }
+};
+
+struct Target {
+    void onEvent(const void* pSender, int& arg) {
+        json j2 = {{"event", arg}};
+        fmt::print("{}\n", j2.dump(4));
+    }
+};
+
+int main(int argc, char** argv)
+{
+    Source source;
+    Target target;
+
+    // subscribe Target::onEvent to the source
+    source.theEvent += delegate(&target, &Target::onEvent);
+    source.fireEvent(0);
+
+    // Unsubscribe Target::onEvent to the source
+    source.theEvent -= delegate(&target, &Target::onEvent);
+    source.fireEvent(1); // no event printed
 }
 """.strip(),
 })
