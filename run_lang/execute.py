@@ -44,26 +44,33 @@ def execute_javascript(code):
 
 
 def execute_cpp(code):
-    with tempfile.TemporaryDirectory() as tmp:
-        out = os.path.join(tmp, 'out')
+    orig = os.getcwd()
+    os.chdir("/playground/build")
+    with tempfile.NamedTemporaryFile('w', dir=".", suffix=".cpp") as tmp:
+        tmp.write(code)
+        tmp.flush()
+        out = Path(tmp.name).stem
         compilation = sp.Popen(
-            ['g++', '-x', 'c++', '-o', out, '-'],
+            ['c++', tmp.name,
+             '@conanbuildinfo.args',
+             '-std=c++17',
+             '-fdiagnostics-color=always',
+             '-o', out],
             stdin=sp.PIPE,
             stdout=sp.PIPE,
             stderr=sp.PIPE,
         )
-        compilation.stdin.write(code.encode('utf-8'))
-        compilation.stdin.close()
         compilation.wait()
-        if compilation.returncode != 0:
-            return response(compilation.returncode,
-                            compilation.stdout.read(),
-                            compilation.stderr.read())
-        evaluation = sp.Popen([out],
-                              stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
-        evaluation.wait()
-        return response(evaluation.returncode,
-                        evaluation.stdout.read(), evaluation.stderr.read())
+    if compilation.returncode != 0:
+        return response(compilation.returncode,
+                        compilation.stdout.read(),
+                        compilation.stderr.read())
+    evaluation = sp.Popen([f"./{out}"],
+                          stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+    evaluation.wait()
+    os.chdir(orig)
+    return response(evaluation.returncode,
+                    evaluation.stdout.read(), evaluation.stderr.read())
 
 
 def execute_rust(code):

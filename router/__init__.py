@@ -1,10 +1,19 @@
-from flask import Flask, render_template, request, Blueprint
-from .schemas import SchemaCodeExec
+from flask import Flask, render_template, request, Blueprint, redirect, url_for
+from flask_login import LoginManager, login_required
+from flask_redis import FlaskRedis
+from .auth import auth as auth_bp, User, SECRET_KEY
+from .code_exec import SchemaCodeExec
+from .playground import SchemaSavePlayground, \
+    DEFAULT_LANGUAGE, DEFAULT_LANG_BUFFERS, DEFAULT_EXECUTION_RESULT
 from .routing_table import RUN_LANG_TABLE
 from marshmallow import ValidationError
+import json
 import requests
+import uuid
 
-bp = Blueprint("rce", __name__)
+redis_client = FlaskRedis()
+
+rce = Blueprint("rce", __name__)
 
 
 def do_code_exec(run_lang_ip, lang, code):
@@ -19,13 +28,57 @@ def do_lang_describe(run_lang_ip, lang):
     return response.json(), response.status_code
 
 
-@bp.route('/')
+def gen_playground_id():
+    # We'll fill up after 16^10 IDs, so this is more than fine for our scale.
+    return uuid.uuid4().hex[0:10]
+
+
+@rce.route('/')
+@login_required
 def playground():
-    return render_template("playground.html")
+    return render_template(
+        "playground.html",
+        active_lang=DEFAULT_LANGUAGE, lang_buffers=DEFAULT_LANG_BUFFERS,
+        execution_result=DEFAULT_EXECUTION_RESULT,
+    )
 
 
-@bp.route('/api/rce', methods=['POST'])
-def rce():
+@rce.route('/<pg_id>')
+def saved_playground(pg_id=None):
+    data = redis_client.get(pg_id)
+    if data is None:
+        return redirect(url_for('rce.playground'))
+
+    data = json.loads(data)
+    return render_template(
+        "playground.html",
+        active_lang=data["active_lang"],
+        lang_buffers=json.dumps(data["lang_buffers"]),
+        execution_result=json.dumps(data["execution_result"]),
+    )
+
+
+@rce.route('/api/save_playground', methods=['POST'])
+def save_playground():
+    json_data = request.get_json()
+    if not json_data:
+        return {"message": "Data must be JSON"}, 400
+    try:
+        data = SchemaSavePlayground().load(json_data)
+    except ValidationError as err:
+        return err.messages, 400
+
+    pg_id = gen_playground_id()
+    while redis_client.exists(pg_id) > 0:
+        pg_id = gen_playground_id()
+
+    redis_client.set(pg_id, json.dumps(data))
+    return {"playgroundId": pg_id}, 200
+
+
+@rce.route('/api/rce', methods=['POST'])
+@login_required
+def remote_code_execution():
     json_data = request.get_json()
     if not json_data:
         return {"message": "Data must be JSON"}, 400
@@ -44,7 +97,8 @@ def rce():
     return do_code_exec(run_lang_ip, lang, code)
 
 
-@bp.route('/api/describe/<lang>', methods=['GET'])
+@rce.route('/api/describe/<lang>', methods=['GET'])
+@login_required
 def describe(lang=None):
     try:
         run_lang_ip = RUN_LANG_TABLE[lang]
@@ -56,6 +110,19 @@ def describe(lang=None):
 
 def create_app():
     app = Flask(__name__)
-    app.register_blueprint(bp)
+    app.register_blueprint(rce)
+    app.register_blueprint(auth_bp)
+
+    app.secret_key = SECRET_KEY
+    app.config["REDIS_URL"] = "redis://localhost:6379/0"
+
+    redis_client.init_app(app)
+
+    login_manager = LoginManager(app)
+    login_manager.login_view = "auth.login_view"
+
+    @login_manager.user_loader
+    def load_user(id):
+        return User(id)
 
     return app

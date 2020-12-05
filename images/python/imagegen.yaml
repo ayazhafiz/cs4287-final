@@ -6,6 +6,6 @@ ecosystem_pkg:
 
 pre_install_pkg:
   - RUN apt-get install -y python3.7 python3-pip
-install_pkg_command: pip3 install
+install_pkg_command: pip3 install {}
 post_install_pkg:
   - RUN echo 0

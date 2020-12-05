@@ -7,6 +7,6 @@ ecosystem_pkg:
 pre_install_pkg:
   - RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
   - RUN apt-get install -y nodejs
-install_pkg_command: npm install
+install_pkg_command: npm install {}
 post_install_pkg:
   - RUN echo 0

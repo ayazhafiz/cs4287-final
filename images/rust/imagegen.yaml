@@ -14,8 +14,7 @@ pre_install_pkg:
   - RUN ls $HOME/playground
   - WORKDIR $HOME/playground
   - RUN mkdir src/bin
-install_pkg_command: cargo add
+install_pkg_command: cargo add {}
 post_install_pkg:
   - RUN cat Cargo.toml
   - RUN cargo build
-  - WORKDIR /

@@ -16,7 +16,7 @@ fi
 
 python3 images/imagegen.py
 
-for lang in python javascript rust; do
+for lang in python javascript cpp rust; do
   dockerfile="images/$lang/Dockerfile"
   image="ayazhafiz/run$lang"
   docker build -t "$image:latest" \

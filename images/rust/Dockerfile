@@ -8,11 +8,11 @@ COPY run_lang/requirements.txt /tmp/requirements.txt
 RUN pip3 install --requirement /tmp/requirements.txt
 
 # Pre-install
+ENV HOME /root
 RUN sudo apt-get install -y git libssl-dev pkg-config
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2020-11-15 --profile minimal
-ENV PATH="/root/.cargo/bin:${PATH}"
+ENV PATH="$HOME/.cargo/bin:${PATH}"
 RUN cargo install cargo-edit
-ENV HOME /root
 RUN USER=playground cargo init --bin $HOME/playground
 RUN ls $HOME/playground
 WORKDIR $HOME/playground
@@ -26,7 +26,6 @@ RUN cargo add rand@0.7.3
 # Post-install
 RUN cat Cargo.toml
 RUN cargo build
-WORKDIR /
 
 # Service setup
 COPY run_lang /run_lang
