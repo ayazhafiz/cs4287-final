@@ -1,13 +1,15 @@
 Resources:
-  # TODO
   AppCluster:
     Type: AWS::EKS::Cluster
     Properties:
       Name: app-cluster
       KubernetesNetworkConfig:
-        # Should *not* overlap with VPC CIDR
+        # Should NOT overlap with VPC CIDR
         ServiceIpv4Cidr: 192.168.0.0/16
-      ResourcesVpcConfig: 
-        ResourcesVpcConfig
-      RoleArn: String
-  # TODO
+      ResourcesVpcConfig:
+        SecurityGroupIds: 
+          - !ImportValue EKSWorkerNodeSecurityGroupID
+        SubnetIds: 
+          - !ImportValue PrivateSubnetID
+          - !ImportValue PrivateSubnetBID
+      RoleArn: arn:aws:iam::979926061731:role/eksClusterRole

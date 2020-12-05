@@ -35,6 +35,15 @@ Resources:
       MapPublicIpOnLaunch: false
       VpcId: !Ref ProdVPC
 
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-2b
+      # 10.0.1.0 - 10.0.1.255
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref ProdVPC
+
   # --------------------------- Route Tables ---------------------------
   PublicSubnetRouteTable:
     Type: AWS::EC2::RouteTable
@@ -73,6 +82,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateSubnetRouteTable
       SubnetId: !Ref PrivateSubnet
+
+  PrivateSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetB
 
   # --------------------------- Gateways ---------------------------
   InternetGateway:
@@ -115,4 +130,8 @@ Outputs:
     Value: !Ref PrivateSubnet
     Export:
       Name: PrivateSubnetID
-
+  PrivateSubnetB:
+    Description: Private Subnet B ID
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: PrivateSubnetBID

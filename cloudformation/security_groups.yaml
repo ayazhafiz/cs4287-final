@@ -16,9 +16,29 @@ Resources:
         # Private Subnet CIDR
         CidrIp: 10.0.2.0/24
 
+  EKSWorkerNodeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group to be used for K8 worker nodes
+      VpcId: !ImportValue ProdVPCID
+      SecurityGroupIngress:
+      - Description: SSH
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        CidrIp: 10.0.2.0/24
+
 Outputs:
   BastionHostSecurityGroup:
     Description: Bastion host security group ID
     Value: !Ref BastionHostSecurityGroup
     Export:
       Name: BastionHostSecurityGroupID
+  EKSWorkerNodeSecurityGroup:
+    Description: Bastion host security group ID
+    Value: !Ref EKSWorkerNodeSecurityGroup
+    Export:
+      Name: EKSWorkerNodeSecurityGroupID
