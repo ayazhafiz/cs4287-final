@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-engine-deployment
+  labels:
+    app: python-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-engine
+  template:
+    metadata:
+      labels:
+        app: python-engine
+    spec:
+      containers:
+      - name: python-engine
+        image: ayazhafiz/runpython:latest
+        ports:
+        - containerPort: 9000

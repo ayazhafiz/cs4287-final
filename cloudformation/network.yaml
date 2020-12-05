@@ -17,6 +17,7 @@ Resources:
       CidrBlock: 10.0.0.0/24
       MapPublicIpOnLaunch: true
       VpcId: !Ref ProdVPC
+
   PublicSubnetB:
     Type: AWS::EC2::Subnet
     Properties: 
@@ -34,6 +35,9 @@ Resources:
       CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: false
       VpcId: !Ref ProdVPC
+      Tags:
+      - Key: kubernetes.io/cluster/app-cluster
+        Value: shared
 
   PrivateSubnetB:
     Type: AWS::EC2::Subnet
@@ -43,6 +47,9 @@ Resources:
       CidrBlock: 10.0.3.0/24
       MapPublicIpOnLaunch: false
       VpcId: !Ref ProdVPC
+      Tags:
+      - Key: kubernetes.io/cluster/app-cluster
+        Value: shared
 
   # --------------------------- Route Tables ---------------------------
   PublicSubnetRouteTable:

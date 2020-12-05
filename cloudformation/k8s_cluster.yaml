@@ -13,3 +13,25 @@ Resources:
           - !ImportValue PrivateSubnetID
           - !ImportValue PrivateSubnetBID
       RoleArn: arn:aws:iam::979926061731:role/eksClusterRole
+
+  AppNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties: 
+      AmiType: AL2_x86_64
+      ClusterName: app-cluster
+      DiskSize: 20
+      ForceUpdateEnabled: true
+      InstanceTypes: 
+        - t2.small
+      NodeRole: arn:aws:iam::979926061731:role/NodeInstanceRole
+      RemoteAccess: 
+        Ec2SshKey: kevinayaz
+        SourceSecurityGroups:
+          - !ImportValue BastionHostSecurityGroupID
+      ScalingConfig:
+        DesiredSize: 2
+        MaxSize: 3
+        MinSize: 1
+      Subnets: 
+        - !ImportValue PrivateSubnetID
+        - !ImportValue PrivateSubnetBID
