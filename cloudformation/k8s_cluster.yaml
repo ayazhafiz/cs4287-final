@@ -12,9 +12,12 @@ Resources:
         SubnetIds: 
           - !ImportValue PrivateSubnetID
           - !ImportValue PrivateSubnetBID
+          - !ImportValue PublicSubnetAID
+          - !ImportValue PublicSubnetBID
       RoleArn: arn:aws:iam::979926061731:role/eksClusterRole
 
   AppNodeGroup:
+    DependsOn: AppCluster
     Type: AWS::EKS::Nodegroup
     Properties: 
       AmiType: AL2_x86_64

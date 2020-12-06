@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: python-engine
+  name: cpp-engine
 spec:
   selector:
-    app: python-engine
+    app: cpp-engine
   ports:
     - protocol: TCP
       port: 80
@@ -13,21 +13,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-engine
+  name: cpp-engine
   labels:
-    app: python-engine
+    app: cpp-engine
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: python-engine
+      app: cpp-engine
   template:
     metadata:
       labels:
-        app: python-engine
+        app: cpp-engine
     spec:
       containers:
-      - name: python-engine
-        image: ayazhafiz/runpython:latest
+      - name: cpp-engine
+        image: ayazhafiz/runcpp:latest
         ports:
         - containerPort: 9000

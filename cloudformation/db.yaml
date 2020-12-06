@@ -1,9 +1,29 @@
-Resources:
-  # TODO
-  ElastiCacheCluster:
-    Type: AWS::ElastiCache::CacheCluster
-    Properties:
-      AutoMinorVersionUpgrade: Boolean
-      AZMode: String
-      CacheNodeType: String
-  # TODO
+# Resources:
+#   ElastiCacheCluster:
+#     Type: AWS::ElastiCache::CacheCluster
+#     Properties: 
+#       AZMode: String
+#       CacheNodeType: String
+#       CacheParameterGroupName: String
+#       CacheSecurityGroupNames: 
+#         - String
+#       CacheSubnetGroupName: String
+#       ClusterName: String
+#       Engine: String
+#       EngineVersion: String
+#       NotificationTopicArn: String
+#       NumCacheNodes: Integer
+#       Port: Integer
+#       PreferredAvailabilityZone: String
+#       PreferredAvailabilityZones: 
+#         - String
+#       PreferredMaintenanceWindow: String
+#       SnapshotArns: 
+#         - String
+#       SnapshotName: String
+#       SnapshotRetentionLimit: Integer
+#       SnapshotWindow: String
+#       Tags: 
+#         - Tag
+#       VpcSecurityGroupIds: 
+#         - String
