@@ -1,33 +1,9 @@
 #!/bin/bash
 
-set -euo pipefail
+set -euxo pipefail
 
 PUSH="${PUSH-false}"
 ORG="kevjin"
-
-# docker build -t "$ORG/runlang_base:latest" \
-#   -f "images/runlang_base/Dockerfile" \
-#   --cache-from "$ORG/runlang_base" \
-#   .
-
-# if [[ "$PUSH" == "true" ]]; then
-#   docker push "$ORG/runlang_base:latest"
-# fi
-
-# python3 images/imagegen.py
-
-# for lang in python javascript cpp rust; do
-#   dockerfile="images/$lang/Dockerfile"
-#   image="$ORG/run$lang"
-#   docker build -t "$image:latest" \
-#     -f "$dockerfile" \
-#     --cache-from "$image" \
-#     .
-
-#   if [[ "$PUSH" == "true" ]]; then
-#     docker push "$image:latest"
-#   fi
-# done
 
 function build_image {
   image_path=$1
@@ -67,7 +43,7 @@ do
 
   if [[ ! -z $image_path && ! -z $dockerfile_path ]]; then
     echo "Building image: $image_path for filepath: $file"
-    # build_image $image_path $dockerfile_path
+    build_image $image_path $dockerfile_path
   fi
 
 done < changed_files.txt
