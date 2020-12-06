@@ -8,12 +8,14 @@ from .playground import SchemaSavePlayground, \
 from .routing_table import RUN_LANG_TABLE
 from marshmallow import ValidationError
 import json
+import redis
 import requests
 import uuid
 
-redis_client = FlaskRedis()
-
 rce = Blueprint("rce", __name__)
+
+redis_read_client = redis.Redis(host='redisread', port=6379, db=0)
+redis_write_client = redis.Redis(host='redisprimary', port=6379, db=0)
 
 
 def do_code_exec(run_lang_ip, lang, code):
@@ -45,7 +47,7 @@ def playground():
 
 @rce.route('/<pg_id>')
 def saved_playground(pg_id=None):
-    data = redis_client.get(pg_id)
+    data = redis_read_client.get(pg_id)
     if data is None:
         return redirect(url_for('rce.playground'))
 
@@ -69,10 +71,10 @@ def save_playground():
         return err.messages, 400
 
     pg_id = gen_playground_id()
-    while redis_client.exists(pg_id) > 0:
+    while redis_read_client.exists(pg_id) > 0:
         pg_id = gen_playground_id()
 
-    redis_client.set(pg_id, json.dumps(data))
+    redis_write_client.set(pg_id, json.dumps(data))
     return {"playgroundId": pg_id}, 200
 
 
@@ -114,9 +116,6 @@ def create_app():
     app.register_blueprint(auth_bp)
 
     app.secret_key = SECRET_KEY
-    app.config["REDIS_URL"] = "redis://localhost:6379/0"
-
-    redis_client.init_app(app)
 
     login_manager = LoginManager(app)
     login_manager.login_view = "auth.login_view"

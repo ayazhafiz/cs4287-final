@@ -29,6 +29,6 @@ spec:
     spec:
       containers:
       - name: router
-        image: kevjin/router:1.6
+        image: kevjin/router:1.11
         ports:
         - containerPort: 8000

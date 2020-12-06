@@ -3,7 +3,7 @@
 set -euvo pipefail
 
 PUSH="${PUSH-false}"
-ORG="ayazhafiz"
+ORG="kevjin"
 
 docker build -t "$ORG/runlang_base:latest" \
   -f "images/runlang_base/Dockerfile" \

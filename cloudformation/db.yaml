@@ -1,29 +1,25 @@
-# Resources:
-#   ElastiCacheCluster:
-#     Type: AWS::ElastiCache::CacheCluster
-#     Properties: 
-#       AZMode: String
-#       CacheNodeType: String
-#       CacheParameterGroupName: String
-#       CacheSecurityGroupNames: 
-#         - String
-#       CacheSubnetGroupName: String
-#       ClusterName: String
-#       Engine: String
-#       EngineVersion: String
-#       NotificationTopicArn: String
-#       NumCacheNodes: Integer
-#       Port: Integer
-#       PreferredAvailabilityZone: String
-#       PreferredAvailabilityZones: 
-#         - String
-#       PreferredMaintenanceWindow: String
-#       SnapshotArns: 
-#         - String
-#       SnapshotName: String
-#       SnapshotRetentionLimit: Integer
-#       SnapshotWindow: String
-#       Tags: 
-#         - Tag
-#       VpcSecurityGroupIds: 
-#         - String
+Resources:
+  RedisCacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      CacheSubnetGroupName: redissubnetgroup
+      Description: Subnets for Redis ElastiCache
+      SubnetIds: 
+        - !ImportValue PrivateSubnetID
+        - !ImportValue PrivateSubnetBID
+
+  RedisCacheReplicationGroup:
+    DependsOn: RedisCacheSubnetGroup
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties: 
+      AutomaticFailoverEnabled: true
+      CacheNodeType: cache.t3.micro
+      CacheParameterGroupName: default.redis6.x
+      CacheSubnetGroupName: redissubnetgroup
+      Engine: redis
+      MultiAZEnabled: true
+      NumCacheClusters: 2
+      Port: 6379
+      ReplicationGroupDescription: Replica group for redis cache cluster
+      SecurityGroupIds: 
+        - !ImportValue RedisCacheClusterSecurityGroupID

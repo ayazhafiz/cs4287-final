@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+ name: redisprimary
+spec:
+ type: ExternalName
+ externalName: rerd43arc1b01hj.5bya30.ng.0001.use2.cache.amazonaws.com
+---
+kind: Service
+apiVersion: v1
+metadata:
+ name: redisread
+spec:
+ type: ExternalName
+ externalName: rerd43arc1b01hj-ro.5bya30.ng.0001.use2.cache.amazonaws.com

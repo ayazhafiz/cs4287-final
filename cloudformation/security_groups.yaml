@@ -14,7 +14,7 @@ Resources:
       - IpProtocol: -1
         # Don't give the bastion host direct egress access to the Internet.
         # Private Subnet CIDR
-        CidrIp: 10.0.2.0/24
+        CidrIp: 10.0.2.0/23
 
   EKSWorkerNodeSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -29,7 +29,27 @@ Resources:
         CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
       - IpProtocol: -1
-        CidrIp: 10.0.2.0/24
+        CidrIp: 10.0.2.0/23
+
+  RedisCacheClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group to be used for redis cluster nodes
+      VpcId: !ImportValue ProdVPCID
+      SecurityGroupIngress:
+      - Description: SSH
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - Description: Redis
+        IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        CidrIp: 10.0.2.0/23
 
 Outputs:
   BastionHostSecurityGroup:
@@ -38,7 +58,12 @@ Outputs:
     Export:
       Name: BastionHostSecurityGroupID
   EKSWorkerNodeSecurityGroup:
-    Description: Bastion host security group ID
+    Description: EKS worker node security group ID
     Value: !Ref EKSWorkerNodeSecurityGroup
     Export:
       Name: EKSWorkerNodeSecurityGroupID
+  RedisCacheClusterSecurityGroup:
+    Description: Redis cluster node security group ID
+    Value: !Ref RedisCacheClusterSecurityGroup
+    Export:
+      Name: RedisCacheClusterSecurityGroupID
