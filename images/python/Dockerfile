@@ -29,4 +29,3 @@ ENV RUN_LANG_WHICH_DESCRIPTION="python 3.7"
 WORKDIR /
 
 CMD ["./start_run_lang.sh"]
-wegwegwee

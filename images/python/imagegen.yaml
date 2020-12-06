@@ -9,4 +9,3 @@ pre_install_pkg:
 install_pkg_command: pip3 install {}
 post_install_pkg:
   - RUN echo 0
-ewgewgwegwe
