@@ -30,3 +30,4 @@ ENV RUN_LANG_WHICH_DESCRIPTION="node 12"
 WORKDIR /
 
 CMD ["./start_run_lang.sh"]
+ewgwegwege

@@ -51,10 +51,12 @@ do
   image_path=""
   dockerfile_path=""
 
+  echo "Changed file: $file"
   for lang in lang_base python javascript cpp rust; do
-    if [[ $file == images/run$lang/* ]]; then
+    if [[ $file == images/$lang/* ]]; then
       if [[ "$built_images" =~ $lang ]]; then
         echo "$lang has already been built. Skipping $file"
+        break
       fi
 
       image_path="$ORG/run$lang"
