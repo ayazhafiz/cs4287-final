@@ -28,6 +28,6 @@ spec:
     spec:
       containers:
       - name: python-engine
-        image: ayazhafiz/runpython:latest
+        image: kevjin/runpython:latest
         ports:
         - containerPort: 9000

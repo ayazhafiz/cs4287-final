@@ -28,6 +28,6 @@ spec:
     spec:
       containers:
       - name: js-engine
-        image: ayazhafiz/runjavascript:latest
+        image: kevjin/runjavascript:latest
         ports:
         - containerPort: 9000

@@ -28,6 +28,6 @@ spec:
     spec:
       containers:
       - name: rust-engine
-        image: ayazhafiz/runrust:latest
+        image: kevjin/runrust:latest
         ports:
         - containerPort: 9000

@@ -1,7 +1,7 @@
 # Generated Dockerfile, do not modify directly!
 # Modify `dockergen.yaml` and run
 #   `python images/dockergen.py` in the root directory.
-FROM ayazhafiz/runlang_base:latest
+FROM kevjin/runlang_base:latest
 SHELL ["/bin/bash", "-c"]
 
 COPY run_lang/requirements.txt /tmp/requirements.txt

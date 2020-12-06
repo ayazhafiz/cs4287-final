@@ -28,6 +28,6 @@ spec:
     spec:
       containers:
       - name: cpp-engine
-        image: ayazhafiz/runcpp:latest
+        image: kevjin/runcpp:latest
         ports:
         - containerPort: 9000
