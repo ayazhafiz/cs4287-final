@@ -16,5 +16,5 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
           KUBECTL_VERSION: "1.19"
-      # - name: Applies all changed k8 manifest/config files.
-      # - run: kubectl get svc
+      - name: Applies all changed k8 manifest/config files.
+        run: kubectl get svc
