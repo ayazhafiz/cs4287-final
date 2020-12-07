@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # - name: deploy to cluster
-      #   uses: steebchen/kubectl@master
-      #   env:
-      #     KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
+      - name: deploy to cluster
+        uses: steebchen/kubectl@master
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
+          KUBECTL_VERSION: "1.19"
       # - name: Applies all changed k8 manifest/config files.
       # - run: kubectl get svc
