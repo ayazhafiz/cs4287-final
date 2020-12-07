@@ -15,5 +15,6 @@ jobs:
         uses: steebchen/kubectl@master
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        args: get svc
       - name: Applies all changed k8 manifest/config files.
         run: kubectl get svc
