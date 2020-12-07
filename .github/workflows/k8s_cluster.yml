@@ -1,0 +1,19 @@
+name: k8s-cluster-deployment
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'kubernetes/**'
+
+jobs:
+  apply-k8s-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: deploy to cluster
+        uses: steebchen/kubectl@master
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
+      - name: Applies all changed k8 manifest/config files.
+      - runs: kubectl get svc
