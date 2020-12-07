@@ -29,5 +29,7 @@ spec:
       containers:
       - name: cpp-engine
         image: kevjin/runcpp:latest
+        # Ensures latest is always pulled from remote registry
+        imagePullPolicy: Always
         ports:
         - containerPort: 9000
