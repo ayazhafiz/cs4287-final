@@ -17,4 +17,4 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Builds and pushes all changed language engine images
-        runs: PUSH=true ./build_images.sh
+        run: PUSH=true ./build_images.sh

@@ -16,4 +16,4 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
       - name: Applies all changed k8 manifest/config files.
-      - runs: kubectl get svc
+      - run: kubectl get svc
