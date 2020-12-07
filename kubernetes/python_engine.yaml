@@ -29,7 +29,7 @@ spec:
       containers:
       - name: python-engine
         image: kevjin/runpython:latest
-        # Ensures latest is always pulled from remote registry
+        # Ensures latest is always pulled from remote registry.
         imagePullPolicy: Always
         ports:
         - containerPort: 9000
