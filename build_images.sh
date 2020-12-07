@@ -28,22 +28,21 @@ do
   dockerfile_path=""
 
   echo "Changed file: $file"
-  for lang in lang_base python javascript cpp rust; do
-    if [[ $file == images/$lang/* ]]; then
+  for lang in runlang_base python javascript cpp rust; do
+    # If the base image was modified, then rebuild all images
+    if [[ $file == images/$lang/* || $file == images/runlang_base/* ]]; then
       if [[ "$built_images" =~ $lang ]]; then
         echo "$lang has already been built. Skipping $file"
-        break
+        continue
       fi
 
       image_path="$ORG/run$lang"
       dockerfile_path="images/$lang/Dockerfile"
       built_images="$built_images $lang"
+
+      echo "Building image: $image_path for filepath: $file"
+      build_image $image_path $dockerfile_path
     fi
   done
-
-  if [[ ! -z $image_path && ! -z $dockerfile_path ]]; then
-    echo "Building image: $image_path for filepath: $file"
-    build_image $image_path $dockerfile_path
-  fi
 
 done < changed_files.txt
