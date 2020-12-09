@@ -31,7 +31,7 @@ RUN conan install ..
 RUN cat conanbuildinfo.args
 WORKDIR /
 
-# Service setup
+# Service setup.
 COPY run_lang /run_lang
 COPY start_run_lang.sh /start_run_lang.sh
 COPY images/cpp/packages /packages
