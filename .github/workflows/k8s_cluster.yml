@@ -32,4 +32,4 @@ jobs:
           echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
 
       - name: Applies all changed k8 manifest/config files.
-        run: kubectl get svc
+        run: ./apply_k8s_changes.sh
