@@ -27,7 +27,7 @@ RUN cargo add rand@0.7.3
 RUN cat Cargo.toml
 RUN cargo build
 
-# Service setup
+# Service setup.
 COPY run_lang /run_lang
 COPY start_run_lang.sh /start_run_lang.sh
 COPY images/rust/packages /packages
