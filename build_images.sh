@@ -21,6 +21,7 @@ function build_image {
 
 built_images=""
 
+git fetch origin master:master
 git diff --name-only HEAD^ HEAD > changed_files.txt
 while IFS= read -r file
 do

@@ -19,7 +19,7 @@ RUN npm install rxjs@6.6.3
 # Post-install
 RUN echo 0
 
-# Service setup.
+# Service setup..
 COPY run_lang /run_lang
 COPY start_run_lang.sh /start_run_lang.sh
 COPY images/javascript/packages /packages
