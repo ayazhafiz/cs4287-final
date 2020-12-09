@@ -2,7 +2,6 @@ FROM ubuntu:18.04
 SHELL ["/bin/bash", "-c"]
 
 ENV RUN_LANG_UBUNTU="18.04"
-# .
 RUN apt-get update
 RUN apt-get install -y curl
 RUN apt-get update && apt-get -y install sudo
