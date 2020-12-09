@@ -26,6 +26,6 @@ jobs:
       - name: Point kubectl to kubeconfig
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig
-          export KUBECONFIG=$(pwd)/kubeconfig
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
       - name: Applies all changed k8 manifest/config files.
         run: kubectl get svc
