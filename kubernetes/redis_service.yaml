@@ -12,5 +12,5 @@ metadata:
   name: redisread
 spec:
   type: ExternalName
-  # Read only endpoint
+  # Read only endpoint.
   externalName: rerd43arc1b01hj-ro.5bya30.ng.0001.use2.cache.amazonaws.com
