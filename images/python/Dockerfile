@@ -14,6 +14,7 @@ RUN apt-get install -y python3.7 python3-pip
 RUN pip3 install numpy==1.19.4
 RUN pip3 install pendulum==2.1.2
 RUN pip3 install requests==2.25.0
+RUN pip3 install psutil==5.7.3
 
 # Post-install
 RUN echo 0
