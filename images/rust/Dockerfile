@@ -9,7 +9,7 @@ RUN pip3 install --requirement /tmp/requirements.txt
 
 # Pre-install
 ENV HOME /root
-RUN sudo apt-get install -y git libssl-dev pkg-config
+RUN apt-get update && apt-get -y install git libssl-dev pkg-config
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly-2020-11-15 --profile minimal
 ENV PATH="$HOME/.cargo/bin:${PATH}"
 RUN cargo install cargo-edit
