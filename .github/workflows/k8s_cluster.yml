@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name:
+      - name: Install kubectl
         run: |
           curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/linux/amd64/kubectl
           chmod +x ./kubectl
@@ -23,5 +23,9 @@ jobs:
       #     KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
       #   with:
       #     args: get svc
+      - name: Point kubectl to kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
       - name: Applies all changed k8 manifest/config files.
         run: kubectl get svc
