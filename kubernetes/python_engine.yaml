@@ -17,7 +17,7 @@ metadata:
   labels:
     app: python-engine
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: python-engine
@@ -29,6 +29,13 @@ spec:
       containers:
       - name: python-engine
         image: kevjin/runpython:latest
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
         # Ensures latest is always pulled from remote registry.
         imagePullPolicy: Always
         ports:
