@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -euxo pipefail
 
 PUSH="${PUSH-false}"
 ORG="kevjin"
@@ -36,7 +36,12 @@ do
         continue
       fi
 
-      image_path="$ORG/run$lang"
+      if [[ $lang == "runlang_base" ]]; then
+        image_path="$ORG/$lang"
+      else
+        image_path="$ORG/run$lang"
+      fi
+
       dockerfile_path="images/$lang/Dockerfile"
       built_images="$built_images $lang"
 
