@@ -12,6 +12,8 @@ import redis
 import requests
 import uuid
 
+THIRTY_DAYS = 60 * 60 * 24 * 30
+
 rce = Blueprint("rce", __name__)
 
 redis_read_client = redis.Redis(host='redisread', port=6379, db=0)
@@ -74,7 +76,7 @@ def save_playground():
     while redis_read_client.exists(pg_id) > 0:
         pg_id = gen_playground_id()
 
-    redis_write_client.set(pg_id, json.dumps(data))
+    redis_write_client.set(pg_id, json.dumps(data), ex=THIRTY_DAYS)
     return {"playgroundId": pg_id}, 200
 
 
