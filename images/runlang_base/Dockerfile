@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 SHELL ["/bin/bash", "-c"]
 
+# bla
 ENV RUN_LANG_UBUNTU="18.04"
 RUN apt-get update
 RUN apt-get install -y curl
