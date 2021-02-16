@@ -5,7 +5,6 @@ from .auth import auth as auth_bp, User, SECRET_KEY
 from .code_exec import SchemaCodeExec
 from .playground import SchemaSavePlayground, \
     DEFAULT_LANGUAGE, DEFAULT_LANG_BUFFERS, DEFAULT_EXECUTION_RESULT
-from .routing_table import RUN_LANG_TABLE
 from marshmallow import ValidationError
 import json
 import redis
@@ -20,8 +19,8 @@ redis_read_client = redis.Redis(host='redisread', port=6379, db=0)
 redis_write_client = redis.Redis(host='redisprimary', port=6379, db=0)
 
 
-def do_code_exec(run_lang_ip, lang, code):
-    addr = "http://%s/api/run/%s" % (run_lang_ip, lang)
+def do_code_exec(lang, code):
+    addr = "http://%s-engine/api/run" % lang
     response = requests.post(addr, json={"code": code})
     return response.json(), response.status_code
 
@@ -93,12 +92,8 @@ def remote_code_execution():
 
     lang = data["lang"]
     code = data["code"]
-    try:
-        run_lang_ip = RUN_LANG_TABLE[data["lang"]]
-    except KeyError:
-        return {"message": "Language \"%s\" is not valid" % lang}, 400
 
-    return do_code_exec(run_lang_ip, lang, code)
+    return do_code_exec(lang, code)
 
 
 @rce.route('/api/describe/<lang>', methods=['GET'])

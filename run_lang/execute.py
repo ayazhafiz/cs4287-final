@@ -2,6 +2,7 @@ import subprocess as sp
 import tempfile
 import os
 from pathlib import Path
+from describe import get_server_lang
 
 
 HOME = os.environ["HOME"]
@@ -94,13 +95,15 @@ def execute_rust(code):
     return response(cmd.returncode, cmd.stdout.read(), cmd.stderr.read())
 
 
-EXECUTE_LANG_TABLE = {
-    "python": execute_python,
-    "javascript": execute_javascript,
-    "cpp": execute_cpp,
-    "rust": execute_rust,
-}
-
-
-def execute(lang, code):
-    return EXECUTE_LANG_TABLE[lang](code)
+def execute(code):
+    lang = get_server_lang()
+    if lang == "python":
+        return execute_python()
+    if lang == "javascript":
+        return execute_javascript()
+    if lang == "cpp":
+        return execute_cpp()
+    if lang == "rust":
+        return execute_rust()
+    else:
+        raise Exception(f"Language not suppported {lang}")

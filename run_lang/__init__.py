@@ -7,12 +7,8 @@ from .describe import get_ubuntu, get_description, \
 bp = Blueprint("rce", __name__)
 
 
-@bp.route('/api/run/<lang>', methods=['POST'])
-def playground(lang=None):
-    if lang != get_server_lang():
-        return {"message":
-                "Language \"%s\" is not valid for this server" % lang}, 400
-
+@bp.route('/api/run', methods=['POST'])
+def playground():
     json_data = request.get_json()
     if not json_data:
         return {"message": "Data must be JSON"}, 400
@@ -21,16 +17,12 @@ def playground(lang=None):
     except KeyError:
         return {"message": "Key \"code\" is not present"}, 400
 
-    result = execute(lang, code)
+    result = execute(code)
     return jsonify(result), 200
 
 
-@bp.route('/api/describe/<lang>', methods=['GET'])
-def describe(lang=None):
-    if lang != get_server_lang():
-        return {"message":
-                "Language \"%s\" is not valid for this server" % lang}, 400
-
+@bp.route('/api/describe', methods=['GET'])
+def describe():
     return jsonify({
         "ubuntu": get_ubuntu(),
         "description": get_description(),

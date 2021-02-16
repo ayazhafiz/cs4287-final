@@ -28,7 +28,7 @@ Resources:
         - t2.small
       NodeRole: arn:aws:iam::979926061731:role/NodeInstanceRole
       RemoteAccess: 
-        Ec2SshKey: kevinayaz
+        Ec2SshKey: kevin
         SourceSecurityGroups:
           - !ImportValue BastionHostSecurityGroupID
       ScalingConfig:

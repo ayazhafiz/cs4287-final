@@ -10,9 +10,9 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       # Ubuntu 18.04
-      ImageId: ami-0e82959d4ed12de3f
-      InstanceType: t3.small
-      KeyName: kevinayaz
+      ImageId: ami-025102f49d03bec05
+      InstanceType: t2.small
+      KeyName: kevin
       SubnetId: !ImportValue PublicSubnetAID
       SecurityGroupIds:
         - !ImportValue BastionHostSecurityGroupID
