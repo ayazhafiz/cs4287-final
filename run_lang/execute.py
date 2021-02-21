@@ -2,7 +2,7 @@ import subprocess as sp
 import tempfile
 import os
 from pathlib import Path
-from describe import get_server_lang
+from .describe import get_server_lang
 
 
 HOME = os.environ["HOME"]

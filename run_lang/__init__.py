@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, Blueprint
 from .execute import execute
-from .describe import get_ubuntu, get_description, \
-    get_packages, get_server_lang
+from .describe import get_ubuntu, get_description, get_packages
 
 
 bp = Blueprint("rce", __name__)

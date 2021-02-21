@@ -4,7 +4,7 @@ metadata:
   name: redisprimary
 spec:
   type: ExternalName
-  externalName: rerd43arc1b01hj.5bya30.ng.0001.use2.cache.amazonaws.com
+  externalName: rer1d703w7hw9bir-001.1ppmpd.0001.usw2.cache.amazonaws.com
 ---
 kind: Service
 apiVersion: v1
@@ -13,4 +13,4 @@ metadata:
 spec:
   type: ExternalName
   # Read only endpoint.
-  externalName: rerd43arc1b01hj-ro.5bya30.ng.0001.use2.cache.amazonaws.com
+  externalName: rer1d703w7hw9bir-002.1ppmpd.0001.usw2.cache.amazonaws.com
