@@ -98,12 +98,12 @@ def execute_rust(code):
 def execute(code):
     lang = get_server_lang()
     if lang == "python":
-        return execute_python()
+        return execute_python(code)
     if lang == "javascript":
-        return execute_javascript()
+        return execute_javascript(code)
     if lang == "cpp":
-        return execute_cpp()
+        return execute_cpp(code)
     if lang == "rust":
-        return execute_rust()
+        return execute_rust(code)
     else:
         raise Exception(f"Language not suppported {lang}")
