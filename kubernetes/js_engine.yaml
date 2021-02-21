@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: js-engine
+  name: javascript-engine
 spec:
   selector:
-    app: js-engine
+    app: javascript-engine
   ports:
     - protocol: TCP
       port: 80
@@ -13,21 +13,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: js-engine
+  name: javascript-engine
   labels:
-    app: js-engine
+    app: javascript-engine
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: js-engine
+      app: javascript-engine
   template:
     metadata:
       labels:
-        app: js-engine
+        app: javascript-engine
     spec:
       containers:
-      - name: js-engine
+      - name: javascript-engine
         image: kevjin/runjavascript:latest
         # Ensures latest is always pulled from remote registry
         imagePullPolicy: Always

@@ -27,12 +27,12 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: js-engine
+  name: javascript-engine
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: js-engine
+    name: javascript-engine
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 50
