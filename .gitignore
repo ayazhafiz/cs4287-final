@@ -2,3 +2,4 @@ __pycache__/
 kubeconfig
 venv/
 changed_files.txt
+ita_public_tools/
