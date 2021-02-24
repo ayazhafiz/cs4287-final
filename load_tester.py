@@ -18,9 +18,10 @@ async def send_request():
     headers = {
         "Cookie": "TODO: disable auth?"
     }
+    start_time = time.time()
     async with aiohttp.ClientSession() as session:
         async with session.post(ENDPOINT_URL, headers=headers, json=data) as resp:
-            return await resp.json()
+            return (await resp.json(), time.time() - start_time)
     return None
 
 
