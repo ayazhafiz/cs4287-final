@@ -80,7 +80,7 @@ def save_playground():
 
 
 @rce.route('/api/rce', methods=['POST'])
-@login_required
+# @login_required
 def remote_code_execution():
     json_data = request.get_json()
     if not json_data:

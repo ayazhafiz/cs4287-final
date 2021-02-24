@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: router
-        image: kevjin/router:1.12
+        image: kevjin/router:1.13
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
