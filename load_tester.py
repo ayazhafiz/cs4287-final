@@ -3,11 +3,12 @@ import asyncio
 import requests
 import sys
 import time
+from traffic_reader import get_requests_per_5_sec
 
 APP_URL = sys.argv[1]
 ENDPOINT_URL = f"{APP_URL}/api/rce"
 
-REQUEST_COUNT = int(sys.argv[2])
+# REQUEST_COUNT = int(sys.argv[2])
 
 async def send_request():
     data = {
@@ -19,15 +20,17 @@ async def send_request():
     }
     async with aiohttp.ClientSession() as session:
         async with session.post(ENDPOINT_URL, headers=headers, json=data) as resp:
-            return resp
+            return await resp.json()
     return None
 
 
 async def main():
-    tasks = [(asyncio.create_task(send_request()), i) for i in range(REQUEST_COUNT)]
-    resps = [(await task, idx) for task, idx in tasks]
-    for resp in resps:
-        print(resp)
+    for i, request_count in enumerate(get_requests_per_5_sec()):
+        tasks = [(asyncio.create_task(send_request()), j) for j in range(request_count)]
+        await asyncio.sleep(5)
+        resps = [(await task, idx) for task, idx in tasks]
+        for resp in resps:
+            print(f"{i * 5} seconds:", resp)
 
 
 start = time.time()
