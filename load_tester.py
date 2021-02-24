@@ -3,8 +3,10 @@ import asyncio
 import requests
 import sys
 import time
-from traffic_reader import get_requests_per_5_sec
+from traffic_reader import get_requests_per_second_interval
 
+# 5 second interval
+INTERVAL = 5
 APP_URL = sys.argv[1]
 ENDPOINT_URL = f"{APP_URL}/api/rce"
 
@@ -26,12 +28,14 @@ async def send_request():
 
 
 async def main():
-    for i, request_count in enumerate(get_requests_per_5_sec()):
+    start_time = time.time()
+    for i, request_count in enumerate(get_requests_per_second_interval(INTERVAL)):
         tasks = [(asyncio.create_task(send_request()), j) for j in range(request_count)]
-        await asyncio.sleep(5)
+        await asyncio.sleep(INTERVAL)
         resps = [(await task, idx) for task, idx in tasks]
+        average_time = sum([resp[0][1] for resp in resps])/len(resps)
         for resp in resps:
-            print(f"{i * 5} seconds:", resp)
+            print(f"{(i+1) * INTERVAL} seconds:", resp, f"average time: {average_time}")
 
 
 start = time.time()
