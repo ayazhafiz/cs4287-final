@@ -1,0 +1,91 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: simple-linear-example
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - deployments/scale
+  - replicasets
+  - replicasets/scale
+  - statefulsets
+  - statefulsets/scale
+  verbs:
+  - '*'
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: custompodautoscaler.com/v1
+kind: CustomPodAutoscaler
+metadata:
+  name: simple-linear-example
+spec:
+  template:
+    spec:
+      containers:
+      - name: simple-linear-example
+        image: kevjin/predictive-horizontal-pod-autoscaler:latest
+        imagePullPolicy: Always
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: python-engine
+  provisionRole: false
+  config:
+    - name: minReplicas
+      value: "1"
+    - name: maxReplicas
+      value: "10"
+    - name: predictiveConfig
+      value: |
+        models:
+        - type: KNN
+          name: KNNPrediction
+          perInterval: 1
+          knn:
+            lookAhead: 120000
+            storedValues: 12
+        decisionType: maximum
+        metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              averageUtilization: 75
+              type: Utilization
+      # value: |
+      #   models:
+      #   - type: Reactive
+      #     name: ReactivePrediction
+      #     perInterval: 1
+      #     reactive:
+      #       lookAhead: 120000
+      #       storedValues: 12
+      #   decisionType: "maximum"
+      #   metrics:
+      #   - type: Resource
+      #     resource:
+      #       name: cpu
+      #       target:
+      #         averageUtilization: 50
+      #         type: Utilization
+    - name: interval
+      value: "10000"
+    - name: downscaleStabilization
+      value: "30"
+    - name: logVerbosity
+      value: "4"
